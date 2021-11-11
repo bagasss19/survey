@@ -1,18 +1,8 @@
-const {Model} = require('../model/user')
+const {SurveyModel} = require('../model/survey')
 
 class Controller {
-    static login (req,res) {
-        Model.login(req,res)
-        .then(data => {
-            res.status(200).json(data)
-        })
-        .catch(err => {
-            res.status(400).json({ msg: `${err}` })
-        })
-    }
-
     static read (req,res) {
-        Model.read(req,res)
+        SurveyModel.read(req,res)
         .then(data => {
             res.status(200).json(data)
         })
@@ -22,7 +12,7 @@ class Controller {
     }
 
     static readId (req,res) {
-        Model.readId(req,res)
+        SurveyModel.readId(req,res)
         .then(data => {
             res.status(200).json(data)
         })
@@ -32,7 +22,7 @@ class Controller {
     }
 
     static create(req,res) {
-        Model.create(req,res)
+        SurveyModel.create(req,res)
         .then(data => {
             res.status(201).json(data)
         })
@@ -42,7 +32,7 @@ class Controller {
     }
 
     static update(req,res) {
-        Model.update(req,res)
+        SurveyModel.update(req,res)
         .then(data => {
             res.status(200).json(data.ops)
         })
@@ -52,7 +42,7 @@ class Controller {
     }
 
     static delete(req,res) {
-        Model.delete(req,res)
+        SurveyModel.delete(req,res)
         .then(data => {
             res.status(200).json({msg : "successfully deleted"})
         })

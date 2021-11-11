@@ -4,26 +4,84 @@ const client = new MongoClient(url, { useUnifiedTopology: true })
 client.connect()
 const db = client.db('test')
 var ObjectId = require('mongodb').ObjectId
+const mongoose = require("mongoose");
+mongoose.connect('mongodb://localhost:27017/test');
+const {userModel} = require("./user")
 
-class Model {
+const surveyModel = mongoose.model(
+    "surveys",
+    new mongoose.Schema({
+        title : String,
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "users"
+        },
+        question: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "surveyQuestion"
+        }]
+    })
+)
+
+const surveyQuestion = mongoose.model(
+    "surveyQuestion",
+    new mongoose.Schema({
+        type: Number,
+        survey_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "surveys"
+        },
+        title: String,
+        answer: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "surveyAnswer"
+        }]
+    })
+)
+
+const surveyAnswer = mongoose.model(
+    "surveyAnswer",
+    new mongoose.Schema({
+        type: Number,
+        survey_question: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "surveyQuestion"
+        },
+        title: String,
+    })
+)
+
+const createSurvey = function (userId, body) {
+    return surveyModel.create(body)
+    .then(data => {
+        console.log(data, "<<????????")
+        return userModel.findByIdAndUpdate(
+            userId,
+            { $push: { survey: data._id } },
+            { new: true, useFindAndModify: false }
+        );
+    })
+    .catch(err => {
+        console.log(err, "<<<<<ERRORR")
+        return err
+    })
+}
+
+class SurveyModel {
     static async read(req, res) {
         try {
-            const surveys = db.collection("surveys")
-            const survey = await surveys.find({}).toArray()
+            let survey = await surveyModel.find().populate("question")
             return survey
         }
         catch (err) {
+            console.log(err, "<?")
             return err
-            // console.log(err, 'masuk di eror!!!!!!!')
         }
     }
 
     static async readId(req, res) {
         try {
-            const surveys = db.collection("surveys")
-            const id = { _id: ObjectId(req.params.id) }
-            let survey = surveys.findOne(id)
-            // console.log(survey, "<<<<<<<<<<surveyee")
+            let survey = await surveyModel.findById(req.params.id).populate("question")
             return survey
         }
         catch (err) {
@@ -34,11 +92,9 @@ class Model {
 
     static async create(req, res) {
         try {
-            const surveys = db.collection("surveys")
-            const data = await surveys.insertOne({
-                surveyname: req.body.surveyname,
-                email: req.body.email
-            })
+            req.body.user = req.userId
+            const data = await createSurvey(req.userId, req.body)
+            console.log("sukses")
             return data
         } catch (err) {
             return err
@@ -84,4 +140,4 @@ class Model {
     }
 }
 
-module.exports = Model
+module.exports = {SurveyModel, surveyQuestion, surveyModel, surveyAnswer}
