@@ -42,7 +42,6 @@ const surveyQuestion = mongoose.model(
 const surveyAnswer = mongoose.model(
     "surveyAnswer",
     new mongoose.Schema({
-        type: Number,
         survey_question: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "surveyQuestion"
@@ -93,6 +92,7 @@ class SurveyModel {
     static async create(req, res) {
         try {
             req.body.user = req.userId
+            req.body.question =[]
             const data = await createSurvey(req.userId, req.body)
             console.log("sukses")
             return data

@@ -1,10 +1,10 @@
-const {surveyAnswer, surveyQuestopn} = require('../model/survey')
+const {surveyAnswer, surveyQuestion} = require('../model/survey')
 
-const createsurveyAnswer = function (id, body) {
+const createsurveyAnswer = function (surveyquestionid, body) {
     return surveyAnswer.create(body)
     .then(data => {
-        return surveyQuestopn.findByIdAndUpdate(
-            id,
+        return surveyQuestion.findByIdAndUpdate(
+            surveyquestionid,
             { $push: { answer: data._id } },
             { new: true, useFindAndModify: false }
         );
@@ -18,7 +18,7 @@ const createsurveyAnswer = function (id, body) {
 class Controller {
     static async read(req, res) {
         try {
-            let survey = await surveyAnswer.find()
+            let survey = await surveyAnswer.find().populate("survey_question")
             res.status(200).json(survey)
         }
         catch (err) {
@@ -40,7 +40,7 @@ class Controller {
     static async create(req, res) {
         console.log("ASHUUPP")
         try {
-            req.body.user = req.userId
+            req.body.survey_question = req.params.id
             req.body.answer = []
             const data = await createsurveyAnswer(req.params.id, req.body)
             res.status(200).json(data)

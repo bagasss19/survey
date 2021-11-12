@@ -1,6 +1,108 @@
 .App {
   text-align: center;
+  min-height: 100vh;
+  /* background-color: #ebebeb; */
 }
+
+.login{
+  background-image: url("./Assets/Login.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  /* background-color: lightslategrey; */
+  min-height: 100vh;
+}
+
+.sticky{
+  position: sticky;
+  top: 0;
+}
+
+.table-fix {
+  position: relative;
+  border-collapse: collapse; 
+}
+
+.logout:hover {
+  background-color: #FFF4F2;
+}
+
+.tablemodel:hover {
+  background-color: #F0F7F4;
+}
+
+.profile:hover {
+  background-color: #F0F7F4;
+}
+
+.Mainkolor {
+  background-image: linear-gradient(to bottom right,   #23a96f, #006d3e);
+}
+
+#ph::placeholder {
+  color: grey;
+  opacity: 1;
+}
+.gold {
+  background-image: linear-gradient(90deg, #FCEABB 0%, #F8B500 100%)
+}
+
+.silver {
+  background-image :linear-gradient(90deg, #EEF2F3 0%, #8E9EAB 100%);
+}
+
+.bronze {
+  background-image :linear-gradient(90deg, #FFD194 0%, #D1913C 100%)
+}
+
+.item .item-wrap {
+  display: block;
+  position: relative; }
+  .item .item-wrap:after {
+    z-index: 2;
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    visibility: hidden;
+    opacity: 0;
+    -webkit-transition: .3s all ease-in-out;
+    -o-transition: .3s all ease-in-out;
+    transition: .3s all ease-in-out; }
+  .item .item-wrap > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    -webkit-transform: translate(-50%, -50%) scale(0);
+    -ms-transform: translate(-50%, -50%) scale(0);
+    transform: translate(-50%, -50%) scale(0);
+    color: #fff;
+    font-size: 1.7rem;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: .3s all ease;
+    -o-transition: .3s all ease;
+    transition: .3s all ease; }
+  .item .item-wrap:hover:after {
+    opacity: 1;
+    visibility: visible; }
+  .item .item-wrap:hover span {
+    margin-top: 0px;
+    opacity: 1;
+    visibility: visible;
+    -webkit-transform: translate(-50%, -50%) scale(1);
+    -ms-transform: translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1); }
+.item:hover a img {
+  -webkit-transform: scale(1.05);
+  -ms-transform: scale(1.05);
+  transform: scale(1.05);
+  -webkit-transition: .3s all ease-in-out;
+  -o-transition: .3s all ease-in-out;
+  transition: .3s all ease-in-out; }
 
 .App-logo {
   height: 40vmin;

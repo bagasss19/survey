@@ -47,8 +47,7 @@ class Model {
                 email: user.email
             }
             let token = jwt.sign(param, "bagasganteng")
-            console.log(token, "<<<<?")
-            return token
+            return {token, username : user.username}
         } catch (err) {
             return err
         }

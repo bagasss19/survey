@@ -19,7 +19,7 @@ const createSurveyQuestion = function (id, body) {
 class Controller {
     static async read(req, res) {
         try {
-            let survey = await surveyQuestion.find()
+            let survey = await surveyQuestion.find().populate("answer").populate("survey_id")
             res.status(200).json(survey)
         }
         catch (err) {
@@ -41,7 +41,7 @@ class Controller {
     static async create(req, res) {
         console.log("ASHUUPP")
         try {
-            req.body.user = req.userId
+            req.body.survey_id = req.params.id
             req.body.answer = []
             const data = await createSurveyQuestion(req.params.id, req.body)
             res.status(200).json(data)
