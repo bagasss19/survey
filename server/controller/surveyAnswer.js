@@ -1,24 +1,10 @@
-const {surveyAnswer, surveyQuestion} = require('../model/survey')
-
-const createsurveyAnswer = function (surveyquestionid, body) {
-    return surveyAnswer.create(body)
-    .then(data => {
-        return surveyQuestion.findByIdAndUpdate(
-            surveyquestionid,
-            { $push: { answer: data._id } },
-            { new: true, useFindAndModify: false }
-        );
-    })
-    .catch(err => {
-        console.log(err, "<<<<<ERRORR")
-        return err
-    })
-}
+const {surveyAnswer} = require('../model/survey')
 
 class Controller {
     static async read(req, res) {
         try {
-            let survey = await surveyAnswer.find().populate("survey_question")
+            let survey = await surveyAnswer.find({respond_id : req.params.id})
+            console.log(survey, "<<<????")
             res.status(200).json(survey)
         }
         catch (err) {
@@ -38,11 +24,9 @@ class Controller {
     }
 
     static async create(req, res) {
-        console.log("ASHUUPP")
         try {
-            req.body.survey_question = req.params.id
-            req.body.answer = []
-            const data = await createsurveyAnswer(req.params.id, req.body)
+            console.log(req.body.body, "<<<?")
+            const data = await surveyAnswer.create(req.body.body)
             res.status(200).json(data)
         } catch (err) {
             console.log(err, "<<<?")

@@ -29,7 +29,7 @@ class Controller {
 
     static async readId(req, res) {
         try {
-            let survey = await surveyQuestion.findById(req.params.id)
+            let survey = await surveyQuestion.find({ survey_id: req.params.id }).exec();
             console.log(survey, "<<??")
             res.status(200).json(survey)
         }
@@ -39,10 +39,8 @@ class Controller {
     }
 
     static async create(req, res) {
-        console.log("ASHUUPP")
         try {
             req.body.survey_id = req.params.id
-            req.body.answer = []
             const data = await createSurveyQuestion(req.params.id, req.body)
             res.status(200).json(data)
         } catch (err) {
@@ -66,7 +64,7 @@ class Controller {
 
     static async delete(req, res) {
         try {
-            const result = await surveyQuestion.findByIdAndRemove(id, body)
+            const result = await surveyQuestion.findByIdAndRemove(req.params.id)
             // console.log(req.params.id, "<<<<<<<PARAAMSSS")
             res.status(200).json({msg : "sukses"})
         }

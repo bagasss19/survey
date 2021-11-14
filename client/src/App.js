@@ -8,6 +8,8 @@ import {
 import Login from './pages/Login'
 import Home from './pages/Home'
 import Survey from './pages/Survey'
+import Respond from './pages/Respond'
+import Summary from './pages/Summary'
 import Navbar from './components/Navbar'
 import PrivateRoute from './components/PrivateRoute'
 
@@ -29,6 +31,8 @@ function App() {
           <PrivateRoute exact path="/" component={Home} auth={isAutheticated}/>
           <PrivateRoute path="/survey/:id" component={Survey} auth={isAutheticated}/>
           <Route path="/login" component={Login} />
+          <Route path="/summary/:id" component={Summary} />
+          <Route path="/respond/:id" component={Respond} />
           {/* <Route path="/register" component={Register} /> */}</div>
         </Switch>
       </Router>

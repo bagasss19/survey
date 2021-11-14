@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Fragment } from 'react'
 import Axios from '../config/axios'
 import ReactLoading from 'react-loading'
 import Modal from 'react-modal'
@@ -32,6 +32,28 @@ export default function Testid() {
     const [title, settitle] = useState(null)
     const [type, settype] = useState(1)
     const [modalIsOpen, setIsOpen] = useState(false)
+    const [answer, setanswer] = useState([
+        { answer: '' }
+    ])
+
+    const handleInputChange = (index, event) => {
+        const values = [...answer]
+        values[index].answer = event.target.value
+        console.log(values)
+        setanswer(values)
+    }
+
+    const handleAddFields = () => {
+        const values = [...answer];
+        values.push({ answer: '' });
+        setanswer(values);
+    }
+
+    const handleRemoveFields = index => {
+        const values = [...answer];
+        values.splice(index, 1);
+        setanswer(values);
+    }
 
     function afterOpenModal() {
         // references are now sync'd and can be accessed.
@@ -46,9 +68,42 @@ export default function Testid() {
         setIsOpen(true);
     }
 
-    const getSurvey = () => {
+    const deleteQuestion = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                setloading(true)
+                Axios({
+                    url: 'surveyquestion/' + id,
+                    method: 'delete',
+                    headers: {
+                        "token": localStorage.token
+                    }
+                })
+                    .then(function (response) {
+                        // handle success
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Delete Survey Success',
+                            icon: 'success',
+                            confirmButtonText: 'Cool'
+                        })
+                        getQuestion()
+                    })
+            }
+        })
+    }
+
+    const getQuestion = () => {
         Axios({
-            url: 'surveyquestion',
+            url: 'surveyquestion/' + id,
             method: 'get',
             headers: {
                 "token": localStorage.token
@@ -56,17 +111,18 @@ export default function Testid() {
         })
             .then(function (response) {
                 // handle success
+                console.log(response.data, "<<QUESTION");
                 setsurvey(response.data)
                 setloading(false)
             })
     }
 
-    function add() {
+    function add(surveyId) {
         setloading(true)
         Axios({
-            url: 'survey',
+            url: 'surveyquestion/' + surveyId,
             method: 'post',
-            data: { title },
+            data: { title, answer, type },
             headers: {
                 "token": localStorage.token
             }
@@ -75,7 +131,7 @@ export default function Testid() {
                 // handle success
                 console.log(response, "response<<<<<<<<<<< SUKSES GAKKKKKK")
                 closeModal()
-                getSurvey()
+                getQuestion()
                 Swal.fire({
                     title: 'Success!',
                     text: "Survey has been added",
@@ -86,7 +142,7 @@ export default function Testid() {
     }
 
     useEffect(() => {
-        getSurvey()
+        getQuestion()
     }, [id])
 
     if (loading) {
@@ -121,20 +177,34 @@ export default function Testid() {
                             <table className="table is-fullwidth" style={{ textAlign: "left" }}>
                                 <thead>
                                     <tr>
+                                        <th>Type</th>
                                         <th>Question</th>
                                         <th>Answer List</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="tablemodel">
-                                    <tr>
-                                        <td>Contoh question</td>
-                                        <td>
-                                            <ul>
-                                                <li>Hahahaha</li>
-                                                <li>Hahahaha</li>
-                                            </ul>
-                                        </td>
-                                    </tr>
+                                    {survey.map((x) => (
+                                        <tr key={x._id}>
+                                            <td>{(() => {
+                                                switch (x.type) {
+                                                    case 1: return <span className="tag is-success is-medium">Radiobox</span>
+                                                    default: return <span className="tag is-success is-medium">Checkbox</span>
+                                                }
+                                            })()}</td>
+                                            <td>{x.title}</td>
+                                            <td>{x.answer.map((y) => (
+                                                <p>{y.answer}</p>
+                                            ))}
+                                            </td>
+                                            <td>
+                                                <button className="button" style={{ marginLeft: "5px", backgroundColor: "#CB3A31", color: "white" }} onClick={(e) => {
+                                                    e.preventDefault()
+                                                    deleteQuestion(x._id)
+                                                }}>Delete</button>
+                                            </td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -187,14 +257,14 @@ export default function Testid() {
                     style={{ width: "100%", margin: "auto", marginTop: "10px" }}
                     onSubmit={(e) => {
                         e.preventDefault()
-                        add()
+                        add(id)
                     }
                     }>
                     <div className="field">
                         <center>
                             <div class="select is-success">
                                 <select defaultValue={type}
-                            onChange={(e) => {settype(Number(e.target.value))}}>
+                                    onChange={(e) => { settype(Number(e.target.value)) }}>
                                     <option value="1">Radiobox</option>
                                     <option value="2">Checkbox</option>
                                 </select>
@@ -205,6 +275,42 @@ export default function Testid() {
                     <div className="field">
                         <input className="input" type="text" name="title" defaultValue={title} placeholder="Question" onChange={e => settitle(e.target.value)} />
                     </div>
+
+                    <div className="field">
+                        {answer.map((inputField, index) => (
+                            <Fragment key={`${inputField}~${index}`}>
+                                <div className="field col-sm-6">
+                                    <label htmlFor="answer">Answer</label>
+                                    <input
+                                        type="text"
+                                        className="input"
+                                        id="answer"
+                                        name="answer"
+                                        value={inputField.answer}
+                                        onChange={event => handleInputChange(index, event)}
+                                    />
+                                </div>
+                                <div className="form-group col-sm-2">
+                                    <button
+                                        className="button"
+                                        type='button'
+                                        onClick={() => handleRemoveFields(index)}
+                                    >
+                                        -
+                                    </button>
+                                    <button
+                                        className="button"
+                                        type='button'
+                                        onClick={() => handleAddFields()}
+                                    >
+                                        +
+                                    </button>
+                                </div>
+                            </Fragment>
+                        ))}
+                    </div>
+
+                    <br />
 
                     <center><button className="button Mainkolor" type="submit" style={{ marginTop: "10px", color: "white" }}>Submit</button></center>
                 </form>

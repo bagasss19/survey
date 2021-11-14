@@ -32,21 +32,21 @@ const surveyQuestion = mongoose.model(
             ref: "surveys"
         },
         title: String,
-        answer: [{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "surveyAnswer"
-        }]
+        answer : []
+        // answer: [{
+        //     type: mongoose.Schema.Types.ObjectId,
+        //     ref: "surveyAnswer"
+        // }]
     })
 )
 
 const surveyAnswer = mongoose.model(
     "surveyAnswer",
     new mongoose.Schema({
-        survey_question: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "surveyQuestion"
-        },
-        title: String,
+        respond_id : String,
+        survey_id: String,
+        question : String,
+        respond: Array
     })
 )
 
