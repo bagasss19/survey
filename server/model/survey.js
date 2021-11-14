@@ -46,6 +46,7 @@ const surveyAnswer = mongoose.model(
         respond_id : String,
         survey_id: String,
         question : String,
+        question_id : String,
         respond: Array
     })
 )

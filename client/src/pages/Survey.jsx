@@ -8,6 +8,46 @@ import {
 } from "react-router-dom"
 import { AiFillCloseCircle } from "react-icons/ai"
 import Swal from 'sweetalert2'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// import { Bar } from 'react-chartjs-2';
+
+// const sample = {
+//     labels: ['1', '2', '3', '4', '5', '6'],
+//     datasets: [
+//         {
+//             label: '# of Red Votes',
+//             data: [12, 19, 3, 5, 2, 3],
+//             backgroundColor: 'rgb(255, 99, 132)',
+//             stack: 'Stack 0',
+//         },
+//         {
+//             label: '# of Blue Votes',
+//             data: [2, 3, 20, 5, 1, 4],
+//             backgroundColor: 'rgb(54, 162, 235)',
+//             stack: 'Stack 0',
+//         },
+//         {
+//             label: '# of Green Votes',
+//             data: [3, 10, 13, 15, 22, 30],
+//             backgroundColor: 'rgb(75, 192, 192)',
+//             stack: 'Stack 1',
+//         },
+//     ],
+// };
+
+// const options = {
+//     scales: {
+//         yAxes: [
+//             {
+//                 ticks: {
+//                     beginAtZero: true,
+//                 },
+//             },
+//         ],
+//     },
+// };
+
 
 Modal.setAppElement('#root');
 
@@ -35,6 +75,8 @@ export default function Testid() {
     const [answer, setanswer] = useState([
         { answer: '' }
     ])
+    const [respond, setrespond] = useState(null)
+    const [user, setuser] = useState(null)
 
     const handleInputChange = (index, event) => {
         const values = [...answer]
@@ -67,6 +109,25 @@ export default function Testid() {
     function openModal() {
         setIsOpen(true);
     }
+
+    function filterUser(data) {
+        let result = data.filter((x, index, self) =>
+            index === self.findIndex((t) => (
+                t.respond_id === x.respond_id
+            ))
+        )
+        setuser(result)
+    }
+
+    const notify = () => toast.success('Link Copied!', {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+    });
 
     const deleteQuestion = (id) => {
         Swal.fire({
@@ -111,8 +172,25 @@ export default function Testid() {
         })
             .then(function (response) {
                 // handle success
-                console.log(response.data, "<<QUESTION");
                 setsurvey(response.data)
+                getAnswer()
+            })
+    }
+
+    const getAnswer = () => {
+        Axios({
+            url: 'surveyanswer/public/read/admin/' + id,
+            method: 'get',
+            headers: {
+                "token": localStorage.token
+            }
+
+        })
+            .then(function (response) {
+                // handle success
+                console.log(response.data, "answer");
+                setrespond(response.data)
+                filterUser(response.data)
                 setloading(false)
             })
     }
@@ -174,6 +252,7 @@ export default function Testid() {
                                 style={{ color: "white", margin: "auto", justifyContent: "center", marginTop: "20px" }}>
                                 Add Question
                             </button>
+                            <button className="button Mainkolor" style={{ color: "white", margin: "auto", justifyContent: "center", marginTop: "20px" }} onClick={() => { navigator.clipboard.writeText("http://localhost:3000/respond/" + id); notify() }}>Copy Survey Link</button>
                             <table className="table is-fullwidth" style={{ textAlign: "left" }}>
                                 <thead>
                                     <tr>
@@ -217,26 +296,25 @@ export default function Testid() {
                     <div className="card" style={{ height: "350px" }}>
                         <header className="card-header" style={{ backgroundColor: "#F0F7F4" }}>
                             <p className="card-header-title">
-                                Survey Response
+                                Survey Responden
                             </p>
                         </header>
 
                         <div className="card-content" style={{ overflow: "scroll", height: "300px" }}>
                             <table className="table is-fullwidth" style={{ textAlign: "left" }}>
-                                <thead className="sticky" style={{ backgroundColor: "white", zIndex: 100 }}>
+                                <thead style={{ backgroundColor: "white", zIndex: 100 }}>
                                     <tr>
-                                        <th>Question</th>
-                                        <th>Response</th>
+                                        <th>User Id</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="tablemodel">
-                                    <tr>
-                                        <td>Contoh question</td>
-                                        <td>
-                                            1. list
-                                            2. list
-                                        </td>
-                                    </tr>
+                                    {user.map((x) => (
+                                        <tr key={x._id}>
+                                            <td>{x.respond_id}</td>
+                                            <td><Link to={`/summary/${x.respond_id}`}> <button className="button is-success">See Response</button></Link></td>
+                                        </tr>
+                                    ))}
                                 </tbody>
                             </table>
                         </div>
@@ -244,6 +322,50 @@ export default function Testid() {
                 </div>
             </div>
 
+            <div className="columns" style={{ marginLeft: "25px", marginTop: "10px", marginRight: "25px" }}>
+                <div className="column">
+                    <div className="card" style={{ height: "350px" }}>
+                        <header className="card-header" style={{ backgroundColor: "#F0F7F4" }}>
+                            <p className="card-header-title">
+                                Survey Response
+                            </p>
+                        </header>
+
+                        <div className="card-content" style={{ overflow: "scroll", height: "300px" }}>
+                            <table className="table is-fullwidth" style={{ textAlign: "left" }}>
+                                <thead style={{ backgroundColor: "white", zIndex: 100 }}>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Response</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="tablemodel">
+                                    {respond.map((x) => (
+                                        <tr key={x._id}>
+                                            <td>{x.question}</td>
+                                            <td>{x.respond.map((y) => (
+                                                <p>{y}</p>))}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <ToastContainer
+                position="bottom-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <Modal
                 isOpen={modalIsOpen}
                 onAfterOpen={afterOpenModal}
@@ -315,6 +437,8 @@ export default function Testid() {
                     <center><button className="button Mainkolor" type="submit" style={{ marginTop: "10px", color: "white" }}>Submit</button></center>
                 </form>
             </Modal>
+
+            {/* <Bar data={sample} options={options} /> */}
         </>
     )
 }

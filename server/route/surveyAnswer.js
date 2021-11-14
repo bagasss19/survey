@@ -4,6 +4,7 @@ const {authentication} = require("../middleware/authentication")
 
 route.post('/', Controller.create)
 route.get('/public/read/:id', Controller.read)
+route.get('/public/read/admin/:id', Controller.admin)
 route.use(authentication)
 route.get('/', Controller.read)
 route.get('/:id', Controller.readId)

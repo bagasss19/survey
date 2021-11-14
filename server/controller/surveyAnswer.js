@@ -12,6 +12,15 @@ class Controller {
         }
     }
 
+    static async admin(req, res) {
+        try {
+            let survey = await surveyAnswer.find({survey_id : req.params.id})
+            res.status(200).json(survey)
+        }
+        catch (err) {
+            res.status(400).json({msg : err})
+        }
+    }
     static async readId(req, res) {
         try {
             let survey = await surveyAnswer.findById(req.params.id)

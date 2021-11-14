@@ -13,7 +13,7 @@ export default function Testid(props) {
     const [answer, setanswer] = useState([])
     const [userId, setuserId] = useState(null)
 
-    const handleInputChangeCheckbox = (index, event, question) => {
+    const handleInputChangeCheckbox = (index, event, question,question_id) => {
         const values = [...answer]
         values[index].survey_id = id
         let output = [...values[index].respond]
@@ -30,16 +30,18 @@ export default function Testid(props) {
             setanswer(values)
         }
         values[index].question = question
+        values[index].question_id = question_id
         setanswer(values)
     }
 
-    const handleInputChangeRadio = (index, event, question) => {
+    const handleInputChangeRadio = (index, event, question, question_id) => {
         const values = [...answer]
         if (values[index].respond.length > 0) {
             values[index].respond.pop()
         }
         values[index].respond.push(event.target.value)
         values[index].question = question
+        values[index].question_id = question_id
         console.log(values)
         setanswer(values)
     }
@@ -56,7 +58,7 @@ export default function Testid(props) {
                 let respond_id = generateString(5)
                 setuserId(respond_id)
                 for (let i = 0; i < response.data.length; i++) {
-                    let obj = { respond_id, survey_id: id, question: "", respond: [] }
+                    let obj = { respond_id, survey_id: id, question: "", respond: [], question_id : "" }
                     output.push(obj)
                 }
                 setanswer(output)
@@ -153,13 +155,13 @@ export default function Testid(props) {
                                                     switch (x.type) {
                                                         case 1: return (
                                                             <label className="checkbox">
-                                                                <input type="checkbox" onChange={event => handleInputChangeCheckbox(index, event, x.title)} value={y.answer} />
+                                                                <input type="checkbox" onChange={event => handleInputChangeCheckbox(index, event, x.title, x._id)} value={y.answer} />
                                                                 {y.answer}
                                                             </label>)
                                                         default: return (
                                                             <div className="control">
                                                                 <label className="radio">
-                                                                    <input type="radio" name="answer" onChange={event => handleInputChangeRadio(index, event, x._id)} value={y.answer} />
+                                                                    <input type="radio" name="answer" onChange={event => handleInputChangeRadio(index, event, x.title, x._id)} value={y.answer} />
                                                                     {y.answer}
                                                                 </label>
                                                             </div>)
