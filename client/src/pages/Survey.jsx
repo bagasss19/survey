@@ -10,44 +10,7 @@ import { AiFillCloseCircle } from "react-icons/ai"
 import Swal from 'sweetalert2'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// import { Bar } from 'react-chartjs-2';
-
-// const sample = {
-//     labels: ['1', '2', '3', '4', '5', '6'],
-//     datasets: [
-//         {
-//             label: '# of Red Votes',
-//             data: [12, 19, 3, 5, 2, 3],
-//             backgroundColor: 'rgb(255, 99, 132)',
-//             stack: 'Stack 0',
-//         },
-//         {
-//             label: '# of Blue Votes',
-//             data: [2, 3, 20, 5, 1, 4],
-//             backgroundColor: 'rgb(54, 162, 235)',
-//             stack: 'Stack 0',
-//         },
-//         {
-//             label: '# of Green Votes',
-//             data: [3, 10, 13, 15, 22, 30],
-//             backgroundColor: 'rgb(75, 192, 192)',
-//             stack: 'Stack 1',
-//         },
-//     ],
-// };
-
-// const options = {
-//     scales: {
-//         yAxes: [
-//             {
-//                 ticks: {
-//                     beginAtZero: true,
-//                 },
-//             },
-//         ],
-//     },
-// };
-
+import { Pie } from 'react-chartjs-2'
 
 Modal.setAppElement('#root');
 
@@ -77,11 +40,12 @@ export default function Testid() {
     ])
     const [respond, setrespond] = useState(null)
     const [user, setuser] = useState(null)
+    const [pie, setpie] = useState(null)
+    const [question, setquestion] = useState(null)
 
     const handleInputChange = (index, event) => {
         const values = [...answer]
         values[index].answer = event.target.value
-        console.log(values)
         setanswer(values)
     }
 
@@ -117,6 +81,16 @@ export default function Testid() {
             ))
         )
         setuser(result)
+    }
+
+    function filterQuestion(data) {
+        let result = data.filter((x, index, self) =>
+            index === self.findIndex((t) => (
+                t.question === x.question
+            ))
+        );
+        console.log(result, ">>>result");
+        setquestion(result)
     }
 
     const notify = () => toast.success('Link Copied!', {
@@ -191,6 +165,24 @@ export default function Testid() {
                 console.log(response.data, "answer");
                 setrespond(response.data)
                 filterUser(response.data)
+                filterQuestion(response.data)
+                getRecap()
+            })
+    }
+
+    const getRecap = () => {
+        Axios({
+            url: 'surveyanswer/read/recap/' + id,
+            method: 'get',
+            headers: {
+                "token": localStorage.token
+            }
+
+        })
+            .then(function (response) {
+                // handle success
+                console.log(response.data, "PIEEE")
+                setpie(response.data)
                 setloading(false)
             })
     }
@@ -340,11 +332,13 @@ export default function Testid() {
                                     </tr>
                                 </thead>
                                 <tbody className="tablemodel">
-                                    {respond.map((x) => (
+                                    {question.map((x, index) => (
                                         <tr key={x._id}>
                                             <td>{x.question}</td>
-                                            <td>{x.respond.map((y) => (
-                                                <p>{y}</p>))}
+                                            <td><Pie data={pie[index]} options={{
+          responsive: true,
+          maintainAspectRatio: false,
+        }}/>
                                             </td>
                                         </tr>
                                     ))}
@@ -438,6 +432,7 @@ export default function Testid() {
                 </form>
             </Modal>
 
+            {/* <Pie data={sample} /> */}
             {/* <Bar data={sample} options={options} /> */}
         </>
     )
