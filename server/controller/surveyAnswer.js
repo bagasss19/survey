@@ -106,7 +106,9 @@ class Controller {
                     for (let k = 0; k < answer.length; k++) {
                         obj.datasets[0].backgroundColor.push(color[k])
                         obj.datasets[0].borderColor.push(color[k])
-                        tempArr.push(answer[k].respond[0])
+                        for (let n = 0; n < answer[k].respond.length; n++) {
+                            tempArr.push(answer[k].respond[n])   
+                        }
                     }
                     const counts = {};
                     let hasil = []
@@ -123,6 +125,10 @@ class Controller {
                     obj.datasets[0].data = hasil
                 } else {
                     // console.log(answer, i)
+                    for (let k = 0; k < answer.length; k++) {
+                        obj.datasets[0].backgroundColor.push(color[k])
+                        obj.datasets[0].borderColor.push(color[k])
+                    }
                     let tempArr = []
                     for (let k = 0; k < answer.length; k++) {
                         tempArr.push(answer[k].respond[0])

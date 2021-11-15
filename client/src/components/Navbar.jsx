@@ -10,7 +10,7 @@ export default function Navbar() {
         return (
             <nav className="navbar" role="navigation" aria-label="main navigation" style={{ position: 'sticky', top: 0, backgroundColor: "#ffffff" }}>
                 <div className="navbar-brand" style={{ position: "absolute", marginTop: "10px", marginLeft: "10px" }}>
-                    <Link to="/"><img src={Logo} alt="tandai" style={{ width: "110px", height: "60px" }} /></Link>
+                    <Link to="/"><img src="https://bulma.io/images/bulma-logo.png" alt="navbar" width="112" height="28" /></Link>
                 </div>
 
                 <div className="navbar-end" style={{ width: "300px" }} >
